@@ -31,6 +31,7 @@ public class Menu implements Screen{
         container.setFillParent(true);
         list.setFillParent(true);
         list.setItems(game.getMapNames().toArray(new String[game.getMapNames().size()]));
+        Gdx.app.log("test", list.getItems().size+"");
         final ScrollPane scrollPane = new ScrollPane(list, skin);
         scrollPane.setFlickScroll(true);
         skin.getFont("default-font").getData().setScale(4f);
@@ -38,6 +39,7 @@ public class Menu implements Screen{
         list.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent inputEvent, float x, float y){
+                if(list.getItems().size == 0)return;
                 game.setScreen(new GameScreen(game, game.getMapByName(list.getSelected())));
             }
         });

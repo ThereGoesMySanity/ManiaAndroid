@@ -28,7 +28,6 @@ public class AndroidMusicPlayer implements MusicPlayer {
         try {
             music.setDataSource(c, Uri.fromFile(f));
             music.prepare();
-            Log.d("test", "why");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,7 +36,6 @@ public class AndroidMusicPlayer implements MusicPlayer {
     @Override
     public void play() {
         music.start();
-        Log.d("test", "eh");
     }
 
     @Override

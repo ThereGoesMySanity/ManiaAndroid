@@ -1,12 +1,8 @@
 package com.mcpubba.game.game;
 
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.mcpubba.game.GameScreen;
-import com.mcpubba.game.ManiaAndroid;
-import com.mcpubba.game.MusicPlayer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,10 +29,10 @@ public class Map {
     private ArrayList<ArrayList<Note>> unHit;
     private Score score;
     private long startTime;
-    private ManiaAndroid m;
-    public Map(File f, ManiaAndroid man){
+    private GameScreen m;
+    public Map(File f, GameScreen game){
         score = new Score();
-        this.m=man;
+        this.m=game;
         if(f.getName().endsWith("osu")){
             Scanner s = null;
             try {
@@ -95,13 +91,13 @@ public class Map {
         }
     }
     public void load(){
-        m.loadMusic(mp3.file());
+        m.game.loadMusic(mp3.file());
         unHit = new ArrayList<ArrayList<Note>>();
         for(int i = 0; i < notes.size(); i++){
             unHit.add(new ArrayList<Note>());
             unHit.get(i).addAll(notes.get(i));
         }
-        m.play();
+        m.game.play();
     }
     public void hitNote(int lane){
         if(getNote(lane)==null)return;
@@ -151,18 +147,23 @@ public class Map {
     public void update() {
         if(unHit.size()==0)return;
         for (int lane = 0; lane < keys; lane++){
-            if (unHit.get(lane).get(0).time - time() < -151 + 3 * od &&
+            if(m.getLane(lane))hold(lane);
+            while (unHit.get(lane).get(0).time - time() < -151 + 3 * od &&
                     unHit.get(lane).get(0).endTime == 0) {
+                unHit.get(lane).remove(0);
+                score.noteHit(0);
+            }
+            while (unHit.get(lane).get(0).endTime>0&&unHit.get(lane).get(0).endTime - time() < -151 + 3 * od) {
                 unHit.get(lane).remove(0);
                 score.noteHit(0);
             }
         }
     }
     public void pause(){
-        m.pause();
+        m.game.pause();
     }
     public void play(){
-        m.play();
+        m.game.play();
     }
     public Score getScore(){return score;}
     public int getKeys() {
@@ -194,6 +195,6 @@ public class Map {
     }
 
     public int time(){
-        return m.time();
+        return m.game.time();
     }
 }
