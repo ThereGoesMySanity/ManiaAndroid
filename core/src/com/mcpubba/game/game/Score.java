@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 
 public class Score {
-    private float acc;
+    private float acc = 1;
     private int n300p;
     private int n300;
     private int n200;
@@ -47,37 +47,36 @@ public class Score {
     public void noteHit(int acc, int raw){
         if(raw != Integer.MIN_VALUE){
             rawAcc.add(raw);
-            Gdx.app.log("acc", raw+"");
         }
         switch(acc){
             case 320:
                 bonus += 2;
                 if(bonus>100)bonus = 100;
-                score += (1000000* mult *0.5/total)*(acc/320)*(32*Math.sqrt(bonus)/320);
+                score += (1000000* mult *0.5f/total)*(32*Math.sqrt(bonus)/320);
                 n300p++;
                 break;
             case 300:
                 bonus += 1;
                 if(bonus>100)bonus = 100;
-                score += (1000000* mult *0.5/total)*(acc/320)*(32*Math.sqrt(bonus)/320);
+                score += (1000000* mult *0.5f/total)*(32*Math.sqrt(bonus)/320);
                 n300++;
                 break;
             case 200:
                 bonus -= 8/div;
                 if(bonus<0)bonus = 0;
-                score += (1000000* mult *0.5/total)*(acc/320)*(16*Math.sqrt(bonus)/320);
+                score += (1000000* mult *0.5f/total)*(16*Math.sqrt(bonus)/320);
                 n200++;
                 break;
             case 100:
                 bonus -= 24/div;
                 if(bonus<0)bonus = 0;
-                score += (1000000* mult *0.5/total)*(acc/320)*(8*Math.sqrt(bonus)/320);
+                score += (1000000* mult *0.5f/total)*(8*Math.sqrt(bonus)/320);
                 n100++;
                 break;
             case 50:
                 bonus -= 44/div;
                 if(bonus<0)bonus = 0;
-                score += (1000000* mult *0.5/total)*(acc/320)*(4*Math.sqrt(bonus)/320);
+                score += (1000000* mult *0.5f/total)*(4*Math.sqrt(bonus)/320);
                 n50++;
                 break;
             case 0:
@@ -87,7 +86,7 @@ public class Score {
                 combo = -1;
                 break;
         }
-        score += (1000000* mult *0.5/total)*(acc/320);
+        score += (1000000* mult *0.5f/total)*(acc/320.0f);
         combo++;
         calculateAcc();
     }

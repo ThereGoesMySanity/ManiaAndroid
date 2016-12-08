@@ -21,6 +21,8 @@ public class GameScreen implements Screen, InputProcessor {
     public final ManiaAndroid game;
     HashMap<String, Texture> note;
     HashMap<String, Texture> key;
+    Texture percent;
+    Texture dot;
 
     Texture[] combo;
     public HitAnim anim;
@@ -64,6 +66,9 @@ public class GameScreen implements Screen, InputProcessor {
         hit.put(300, new Texture("mania/mania-hit300.png"));
         hit.put(320, new Texture("mania/mania-hit300g.png"));
 
+        dot = new Texture("mania/score-dot.png");
+        percent = new Texture("mania/score-percent.png");
+
         anim = new HitAnim(hit);
 
         Gdx.input.setInputProcessor(this);
@@ -97,7 +102,7 @@ public class GameScreen implements Screen, InputProcessor {
                 if(map.getUnHit().get(i).get(j).endTime() > 0){
                     if(map.getUnHit().get(i).get(j).isSlbreak()
                             ||map.getUnHit().get(i).get(j).getFirstHit()==0){
-                        game.getBatch().setColor(0,0,0,0.4f);
+                        game.getBatch().setColor(1,1,1,0.4f);
                     }
                     game.getBatch().draw(getNoteType(i, keys, "L"),
                             i*w/keys,
@@ -121,7 +126,7 @@ public class GameScreen implements Screen, InputProcessor {
                             82 * (w / keys) / 256);
                     if(map.getUnHit().get(i).get(j).isSlbreak()
                             ||map.getUnHit().get(i).get(j).getFirstHit()==0){
-                        game.getBatch().setColor(0,0,0,0);
+                        game.getBatch().setColor(Color.WHITE);
                     }
 
                 }else {
@@ -141,8 +146,30 @@ public class GameScreen implements Screen, InputProcessor {
         String cs = com+"";
         for(int i = cs.length()-1; i >= 0; i--){
             if (com==0)break;
-            game.getBatch().draw(combo[com%10], (2*w-(cs.length()-2*i)*66)/4, h*2/3, 66, 92);
+            int gap = -10;
+            game.getBatch().draw(combo[com%10], (w+(2*i-cs.length())*(gap+66)+gap)/2, h*2/3, 66, 92);
             com /=10;
+        }
+        String ss = map.getScore().getScore()+"";
+        for(int i = 0; i < ss.length(); i++){
+            game.getBatch().draw(combo[ss.charAt(i)-48], w-56*(ss.length()-i), h-92, 66, 92);
+        }
+        String as = String.format("%02.2f", map.getScore().getAcc()*100);
+        if(map.getScore().getAcc()==1){
+            game.getBatch().draw(combo[as.charAt(0) - 48], w - 56 * 6 - 28, h - 184, 66, 92);
+            game.getBatch().draw(combo[as.charAt(1) - 48], w - 56 * 5 - 28, h - 184, 66, 92);
+            game.getBatch().draw(combo[as.charAt(2) - 48], w - 56 * 4 - 28, h - 184, 66, 92);
+            game.getBatch().draw(dot, w - 56 * 3 - 28, h - 184, 28, 92);
+            game.getBatch().draw(combo[as.charAt(4) - 48], w - 56 * 3, h - 184, 66, 92);
+            game.getBatch().draw(combo[as.charAt(5) - 48], w - 56 * 2, h - 184, 66, 92);
+            game.getBatch().draw(percent, w - 56, h - 184, 66, 92);
+        }else {
+            game.getBatch().draw(combo[as.charAt(0) - 48], w - 56 * 5 - 28, h - 184, 66, 92);
+            game.getBatch().draw(combo[as.charAt(1) - 48], w - 56 * 4 - 28, h - 184, 66, 92);
+            game.getBatch().draw(dot, w - 56 * 3 - 28, h - 184, 28, 92);
+            game.getBatch().draw(combo[as.charAt(3) - 48], w - 56 * 3, h - 184, 66, 92);
+            game.getBatch().draw(combo[as.charAt(4) - 48], w - 56 * 2, h - 184, 66, 92);
+            game.getBatch().draw(percent, w - 56, h - 184, 66, 92);
         }
         anim.draw(game.getBatch(), w/2, h/2, 2);
         
