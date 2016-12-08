@@ -18,10 +18,7 @@ public class ScoreScreen implements Screen {
     Score score;
     Stage stage;
     final ManiaAndroid mania;
-    //OrthographicCamera cam;
     public ScoreScreen(final ManiaAndroid m, Score s){
-        //cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        //.setToOrtho(false);
         mania = m;
         score = s;
         Gdx.app.log("Score.Mean: ", s.getMean()+"");
@@ -38,10 +35,15 @@ public class ScoreScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        //mania.getBatch().setProjectionMatrix(cam.combined);
+        int w = Gdx.graphics.getWidth();
+        int h = Gdx.graphics.getHeight();
         mania.getBatch().begin();
         mania.getBatch().setColor(Color.WHITE);
-        mania.font.draw(mania.getBatch(), score.getScore()+"", 100, 100);
+        mania.font.getData().setScale(10);
+        mania.font.draw(mania.getBatch(), score.getScore()+"", 50, h-100);
+        mania.font.draw(mania.getBatch(), score.getAcc()+"%", 50, h-250);
+        mania.font.draw(mania.getBatch(), score.getMaxCombo()+"x", 50, h-400);
+        mania.font.draw(mania.getBatch(), score.getMisses()+" misses", 50, h-550);
         mania.getBatch().end();
     }
 

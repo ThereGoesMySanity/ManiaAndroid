@@ -18,6 +18,11 @@ public class Score {
     private int n50;
     private int misses;
     private int combo;
+
+    public int getMaxCombo() {
+        return maxCombo;
+    }
+
     private int maxCombo;
     private int bonus;
     private int score;

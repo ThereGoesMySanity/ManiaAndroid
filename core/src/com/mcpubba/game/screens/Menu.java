@@ -9,40 +9,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.mcpubba.game.ManiaAndroid;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
- * Created by Will on 2016-12-06.
+ * The main menu. I'm probably going to overhaul this because it's really bad lol
  */
 
-public class Menu implements Screen{
+public class Menu implements Screen, InputProcessor{
     final ManiaAndroid game;
-    private Stage stage;
-    private List<String> list;
-    private Table container;
+    private ArrayList<String> items;
+    private int v;
+    private int x;
+
     public Menu(final ManiaAndroid game){
         this.game = game;
-        stage = new Stage();
-        Skin skin = new Skin(Gdx.files.internal("data/uiskin.json"));
-        Gdx.input.setInputProcessor(stage);
-        container = new Table();
-        list = new List<String>(skin);
-        stage.addActor(container);
-        container.setFillParent(true);
-        list.setFillParent(true);
-        list.setItems(game.getMapNames().toArray(new String[game.getMapNames().size()]));
-        Gdx.app.log("test", list.getItems().size+"");
-        final ScrollPane scrollPane = new ScrollPane(list, skin);
-        scrollPane.setFlickScroll(true);
-        skin.getFont("default-font").getData().setScale(4f);
-        container.add(list).expand().fill();
-        list.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent inputEvent, float x, float y){
-                if(list.getItems().size == 0)return;
-                game.setScreen(new GameScreen(game, game.getMapByName(list.getSelected())));
-            }
-        });
+        Gdx.input.setInputProcessor(this);
+        items = game.getMapNames();
+
     }
     @Override
     public void show() {
@@ -51,10 +38,19 @@ public class Menu implements Screen{
 
     @Override
     public void render(float delta) {
+        x+=v--;
+        if(v<0)v=0;
         Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+        game.getBatch().begin();
+        game.font.getData().setScale(2);
+        for(int i = 0; i < items.size(); i++){
+            game.font.draw(game.getBatch(),
+                    items.get(i),
+                    0, Gdx.graphics.getHeight()+x-i*30
+            );
+        }
+        game.getBatch().end();
     }
 
     @Override
@@ -80,5 +76,55 @@ public class Menu implements Screen{
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return true;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (Gdx.input.getDeltaY(pointer)<2&&
+                (x+screenY)/30>0&&
+                (x+screenY)/30<items.size()){
+            Gdx.app.log("test", screenY+"");
+            game.setScreen(new GameScreen(game,
+                    game.getMapByName(items.get((Gdx.graphics.getHeight()+x-screenY)/30))));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        v = -(int)Math.signum(Gdx.input.getDeltaY(pointer))
+                *Math.max(Math.abs(Gdx.input.getDeltaY(pointer)), Math.abs(v));
+
+        return true;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
     }
 }

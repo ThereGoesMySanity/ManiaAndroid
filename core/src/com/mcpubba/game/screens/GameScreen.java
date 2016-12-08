@@ -29,14 +29,16 @@ public class GameScreen implements Screen, InputProcessor {
     Map map;
     float speed = 3;
     HashMap<Integer, Integer> keysDown;
-    int hitLoc;
+    int hitLoc = Gdx.app.getGraphics().getHeight()/4;
     public int offset = 75;
+    public boolean ready;
     public GameScreen(final ManiaAndroid mania, Map m){
         game = mania;
         keysDown = new HashMap<Integer, Integer>();
         HashMap<Integer, Texture> hit = new HashMap<Integer, Texture>();
         note = new HashMap<String, Texture>();
         key = new HashMap<String, Texture>();
+        ready = false;
 
         note.put("1", new Texture("mania/mania-note1.png"));
         note.put("2", new Texture("mania/mania-note2.png"));
@@ -84,17 +86,13 @@ public class GameScreen implements Screen, InputProcessor {
     public void render(float delta) {
         int w = Gdx.app.getGraphics().getWidth();
         int h = Gdx.app.getGraphics().getHeight();
-        int t = map.time();
-        int keys = map.getKeys();
-        if(hitLoc==0)hitLoc=h/6;
-        map.update();
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(!ready)return;
+        map.update();
+        int t = map.time();
+        int keys = map.getKeys();
         game.getBatch().begin();
-        if(t<0){
-            game.getBatch().end();
-            return;
-        }
         for(int i = 0; i < keys; i++){
             for(int j = 0; j<map.getUnHit().get(i).size()
                     &&(map.getUnHit().get(i).get(j).time()-t)<(h-hitLoc)/speed; j++){
@@ -139,7 +137,7 @@ public class GameScreen implements Screen, InputProcessor {
             }
             game.getBatch().draw(getKeyType(i, keys, getLane(i)),
                     i*w/keys, 0,
-                    w/keys, hitLoc*2);
+                    w/keys, hitLoc*1.75f);
         }
 
         int com = map.getScore().getCombo();
@@ -154,7 +152,8 @@ public class GameScreen implements Screen, InputProcessor {
         for(int i = 0; i < ss.length(); i++){
             game.getBatch().draw(combo[ss.charAt(i)-48], w-56*(ss.length()-i), h-92, 66, 92);
         }
-        String as = String.format("%02.2f", map.getScore().getAcc()*100);
+        String as = String.format("%.2f", map.getScore().getAcc()*100);
+        if(as.length()<5)as="0"+as;
         if(map.getScore().getAcc()==1){
             game.getBatch().draw(combo[as.charAt(0) - 48], w - 56 * 6 - 28, h - 184, 66, 92);
             game.getBatch().draw(combo[as.charAt(1) - 48], w - 56 * 5 - 28, h - 184, 66, 92);
@@ -264,6 +263,7 @@ public class GameScreen implements Screen, InputProcessor {
         return false;
     }
     public void setLane(int lane, Integer pointer){
+        if(!ready)return;
         keysDown.put(lane, pointer);
 
         if (pointer==null) map.releaseNote(lane);

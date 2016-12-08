@@ -4,8 +4,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
 
 import com.mcpubba.game.game.Map;
 
@@ -16,7 +14,7 @@ import java.io.IOException;
  * Created by Will on 2016-12-06.
  */
 
-public class AndroidMusicPlayer implements MusicPlayer, MediaPlayer.OnCompletionListener {
+public class AndroidMusicPlayer implements com.mcpubba.game.util.MusicPlayer, MediaPlayer.OnCompletionListener {
     MediaPlayer music;
     Context c;
     Map map;

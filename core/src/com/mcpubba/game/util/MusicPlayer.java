@@ -1,4 +1,4 @@
-package com.mcpubba.game;
+package com.mcpubba.game.util;
 
 import com.mcpubba.game.game.Map;
 

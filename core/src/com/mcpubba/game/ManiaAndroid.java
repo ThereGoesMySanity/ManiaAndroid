@@ -6,9 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mcpubba.game.game.Map;
-import com.mcpubba.game.screens.GameScreen;
 import com.mcpubba.game.screens.Menu;
 
 import java.io.File;
@@ -27,9 +25,9 @@ public class ManiaAndroid extends Game {
     public BitmapFont font;
     ArrayList<Map> maps;
     HashMap<String, Map> mapNames;
-    MusicPlayer music;
+    com.mcpubba.game.util.MusicPlayer music;
 
-    public ManiaAndroid(MusicPlayer music){
+    public ManiaAndroid(com.mcpubba.game.util.MusicPlayer music){
         this.music = music;
     }
 	@Override
@@ -70,7 +68,7 @@ public class ManiaAndroid extends Game {
                     maps.add(new Map(j.file()));
                 }
             }else if(i.name().endsWith(".osz")){
-                DecompressFast d = new DecompressFast(
+                com.mcpubba.game.util.DecompressFast d = new com.mcpubba.game.util.DecompressFast(
                         i.path(),
                         i.path().substring(0, i.path().length()-4));
                 d.unzip();

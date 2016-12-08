@@ -1,6 +1,10 @@
 package com.mcpubba.game.game;
 
 
+import com.badlogic.gdx.Audio;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.loaders.SoundLoader;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.mcpubba.game.screens.GameScreen;
 import com.mcpubba.game.screens.ScoreScreen;
@@ -8,6 +12,7 @@ import com.mcpubba.game.screens.ScoreScreen;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +22,7 @@ import java.util.regex.Pattern;
  */
 
 public class Map {
-    private static final Pattern hitObj = Pattern.compile("(\\d+),\\d+,(\\d+),\\d+,\\d+,(\\d*):?\\d:0:0:0:");
+    private static final Pattern hitObj = Pattern.compile("(\\d+),\\d+,(\\d+),\\d+,\\d+,(\\d*):?\\d:\\d+:\\d+:\\d+:(.*)");
     private FileHandle mp3;
     private int keys;
     private int leadIn;
@@ -28,11 +33,14 @@ public class Map {
     private String creator;
     private ArrayList<ArrayList<Note>> notes;
     private ArrayList<ArrayList<Note>> unHit;
+    private ArrayList<FileHandle> sounds;
+    private HashMap<String, Sound> loadedSounds;
     private Score score;
-    private long startTime;
     private GameScreen game;
     public Map(File f){
         int note = 0;
+        sounds = new ArrayList<FileHandle>();
+        loadedSounds = new HashMap<String, Sound>();
         if(f.getName().endsWith("osu")){
             Scanner s = null;
             try {
@@ -78,11 +86,17 @@ public class Map {
                     String i = s.nextLine();
                     Matcher m = hitObj.matcher(i);
                     if(m.matches()) {
-                        notes.get(Integer.parseInt(m.group(1))*keys/512)
+                        if(m.group(4).length()>0) {
+                            sounds.add(Gdx.files.external(
+                                    "ManiaAndroid/Songs/"+
+                                            f.getParentFile().getName()+
+                                            "/"+m.group(4)));
+                        }
+                        notes.get(Integer.parseInt(m.group(1)) * keys / 512)
                                 .add(new Note(
                                         Integer.parseInt(m.group(2)),
-                                        m.group(3).length()==0?0:Integer.parseInt(m.group(3))
-                                ));
+                                        m.group(3).length() == 0 ? 0 : Integer.parseInt(m.group(3)),
+                                        m.group(4)));
                         note++;
                     }
                 }
@@ -95,12 +109,19 @@ public class Map {
     public void load(GameScreen g){
         game = g;
         game.game.loadMusic(mp3.file(), this);
+        loadSounds();
         unHit = new ArrayList<ArrayList<Note>>();
         for(int i = 0; i < notes.size(); i++){
             unHit.add(new ArrayList<Note>());
             unHit.get(i).addAll(notes.get(i));
         }
         game.game.play();
+        game.ready = true;
+    }
+    public void loadSounds(){
+        for(FileHandle f : sounds){
+            loadedSounds.put(f.name(), Gdx.audio.newSound(f));
+        }
     }
     public void hitNote(int lane){
         if(getNote(lane)==null)return;
@@ -122,24 +143,29 @@ public class Map {
         }
         if(hit>-1){
             if(getNote(lane).endTime==0) {
+                registerHit(hit, time, getNote(lane));
                 unHit.get(lane).remove(0);
-                registerHit(hit, time);
             }else{
                 getNote(lane).hit(hit, time());
+                if(getNote(lane).getSound(false)!=""&&!getNote(lane).soundPlayed)
+
+                    loadedSounds.get(getNote(lane).getSound(true)).play();
                 score.addTime(time);
             }
         }
     }
-    public void registerHit(int hit, int time){
+    private void registerHit(int hit, int time, Note note){
+        if(note.getSound(false)!=""&&!note.soundPlayed) {
+            loadedSounds.get(note.getSound(true)).play();
+        }
         score.noteHit(hit, time);
         game.anim.setCurrentHit(hit);
     }
-    public void hold(int lane){
+    private void hold(int lane){
         if(getNote(lane)==null)return;
         if(getNote(lane).endTime==0)return;
         if(getNote(lane).endTime-time()<=-127+3*od){
-
-            registerHit(getNote(lane).getFirstHit()==0?50:100, Integer.MIN_VALUE);
+            registerHit(getNote(lane).getFirstHit()==0?50:100, Integer.MIN_VALUE, getNote(lane));
             unHit.get(lane).remove(0);
             return;
         }
@@ -155,7 +181,7 @@ public class Map {
         if(note.time()-time()>0)return;
         int time = note.endTime-time();
         int absTime = Math.abs(time);
-        int hit = -1;
+        int hit;
         if(absTime<17){
             hit = (320);
         } else if(absTime<64-3*od){
@@ -170,7 +196,7 @@ public class Map {
             return;
         }
         if(note.slbreak){
-            registerHit(50, time);
+            registerHit(50, time, note);
             unHit.get(lane).remove(0);
             return;
         }
@@ -178,20 +204,20 @@ public class Map {
             case 320:
                 switch (note.getFirstHit()){
                     case 320:
-                        registerHit(320, time);
+                        registerHit(320, time, note);
                         break;
                     case 300:
-                        registerHit(300, time);
+                        registerHit(300, time, note);
                         break;
                     case 200:
                     case 100:
-                        registerHit(200, time);
+                        registerHit(200, time, note);
                         break;
                     case 50:
-                        registerHit(100, time);
+                        registerHit(100, time, note);
                         break;
                     case 0:
-                        registerHit(50, time);
+                        registerHit(50, time, note);
                         break;
                 }
                 break;
@@ -200,14 +226,14 @@ public class Map {
                     case 320:
                     case 300:
                     case 200:
-                        registerHit(300, time);
+                        registerHit(300, time, note);
                         break;
                     case 100:
                     case 50:
-                        registerHit(200, time);
+                        registerHit(200, time, note);
                         break;
                     case 0:
-                        registerHit(50, time);
+                        registerHit(50, time, note);
                         break;
                 }
                 break;
@@ -215,17 +241,17 @@ public class Map {
                 switch (note.getFirstHit()){
                     case 320:
                     case 300:
-                        registerHit(300, time);
+                        registerHit(300, time, note);
                         break;
                     case 200:
                     case 100:
-                        registerHit(200, time);
+                        registerHit(200, time, note);
                         break;
                     case 50:
-                        registerHit(100, time);
+                        registerHit(100, time, note);
                         break;
                     case 0:
-                        registerHit(50, time);
+                        registerHit(50, time, note);
                         break;
                 }
                 break;
@@ -233,17 +259,17 @@ public class Map {
                 switch (note.getFirstHit()){
                     case 320:
                     case 300:
-                        registerHit(300, time);
+                        registerHit(300, time, note);
                         break;
                     case 200:
-                        registerHit(200, time);
+                        registerHit(200, time, note);
                         break;
                     case 100:
                     case 50:
-                        registerHit(100, time);
+                        registerHit(100, time, note);
                         break;
                     case 0:
-                        registerHit(50, time);
+                        registerHit(50, time, note);
                         break;
                 }
                 break;
@@ -252,17 +278,17 @@ public class Map {
                     case 320:
                     case 300:
                     case 200:
-                        registerHit(100, time);
+                        registerHit(100, time, note);
                         break;
                     case 100:
                     case 50:
                     case 0:
-                        registerHit(50, time);
+                        registerHit(50, time, note);
                         break;
                 }
                 break;
             case 0:
-                registerHit(0, time);
+                registerHit(0, time, note);
                 break;
         }
         unHit.get(lane).remove(0);
@@ -277,18 +303,18 @@ public class Map {
         for (int lane = 0; lane < keys; lane++){
             if (game.getLane(lane)) hold(lane);
             while (unHit.get(lane).size()>0&&
-                    unHit.get(lane).get(0).time - time() < -151 + 3 * od &&
-                    unHit.get(lane).get(0).endTime == 0) {
-                unHit.get(lane).remove(0);
+                    getNote(lane).time - time() < -151 + 3 * od &&
+                    getNote(lane).endTime == 0) {
 
-                registerHit(0, Integer.MIN_VALUE);
+                registerHit(0, Integer.MIN_VALUE, getNote(lane));
+                unHit.get(lane).remove(0);
             }
             while (unHit.get(lane).size()>0&&
-                    unHit.get(lane).get(0).endTime > 0&&
-                    unHit.get(lane).get(0).endTime - time() < -151 + 3 * od) {
+                    getNote(lane).endTime > 0&&
+                    getNote(lane).endTime - time() < -151 + 3 * od) {
                 unHit.get(lane).remove(0);
 
-                registerHit(0, Integer.MIN_VALUE);
+                registerHit(0, Integer.MIN_VALUE, getNote(lane));
             }
         }
     }

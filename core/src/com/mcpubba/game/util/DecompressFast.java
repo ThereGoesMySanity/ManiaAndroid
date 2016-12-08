@@ -1,4 +1,4 @@
-package com.mcpubba.game;
+package com.mcpubba.game.util;
 
 /**
  * Copied from StackOverflow on 2016-12-04
