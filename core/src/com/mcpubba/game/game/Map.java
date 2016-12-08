@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
  */
 
 public class Map {
+    private final boolean useHitSounds = false;
     private static final Pattern hitObj = Pattern.compile("(\\d+),\\d+,(\\d+),\\d+,\\d+,(\\d*):?\\d:\\d+:\\d+:\\d+:(.*)");
     private FileHandle mp3;
     private int keys;
@@ -86,7 +87,12 @@ public class Map {
                     String i = s.nextLine();
                     Matcher m = hitObj.matcher(i);
                     if(m.matches()) {
-                        if(m.group(4).length()>0) {
+                        if(useHitSounds&&
+                                m.group(4).length()>0&&
+                                !sounds.contains(Gdx.files.external(
+                                "ManiaAndroid/Songs/"+
+                                        f.getParentFile().getName()+
+                                        "/"+m.group(4)))) {
                             sounds.add(Gdx.files.external(
                                     "ManiaAndroid/Songs/"+
                                             f.getParentFile().getName()+
@@ -104,12 +110,12 @@ public class Map {
                 e.printStackTrace();
             }
         }
-        score = new Score(note);
+        score = new Score(note, this);
     }
     public void load(GameScreen g){
         game = g;
         game.game.loadMusic(mp3.file(), this);
-        loadSounds();
+        if(useHitSounds)loadSounds();
         unHit = new ArrayList<ArrayList<Note>>();
         for(int i = 0; i < notes.size(); i++){
             unHit.add(new ArrayList<Note>());
@@ -147,16 +153,24 @@ public class Map {
                 unHit.get(lane).remove(0);
             }else{
                 getNote(lane).hit(hit, time());
-                if(getNote(lane).getSound(false)!=""&&!getNote(lane).soundPlayed)
-
+                if(useHitSounds&&
+                        !getNote(lane).getSound(false).equals("")
+                        &&!getNote(lane).soundPlayed
+                        &&hit!=0)
                     loadedSounds.get(getNote(lane).getSound(true)).play();
                 score.addTime(time);
             }
         }
     }
     private void registerHit(int hit, int time, Note note){
-        if(note.getSound(false)!=""&&!note.soundPlayed) {
+        if(useHitSounds&&
+                !note.getSound(false).equals("")
+                &&!note.soundPlayed
+                &&hit!=0) {
             loadedSounds.get(note.getSound(true)).play();
+        }
+        if(hit==0&&score.getCombo()>19){
+            game.missSound.play();
         }
         score.noteHit(hit, time);
         game.anim.setCurrentHit(hit);
@@ -193,6 +207,9 @@ public class Map {
         }else{
             note.slBreak();
             score.sliderBreak();
+            if(score.getCombo()>19){
+                game.missSound.play();
+            }
             return;
         }
         if(note.slbreak){

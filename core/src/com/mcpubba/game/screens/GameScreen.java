@@ -3,6 +3,7 @@ package com.mcpubba.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +22,7 @@ public class GameScreen implements Screen, InputProcessor {
     public final ManiaAndroid game;
     HashMap<String, Texture> note;
     HashMap<String, Texture> key;
+    public Sound missSound;
     Texture percent;
     Texture dot;
 
@@ -32,6 +34,7 @@ public class GameScreen implements Screen, InputProcessor {
     int hitLoc = Gdx.app.getGraphics().getHeight()/4;
     public int offset = 75;
     public boolean ready;
+
     public GameScreen(final ManiaAndroid mania, Map m){
         game = mania;
         keysDown = new HashMap<Integer, Integer>();
@@ -39,6 +42,7 @@ public class GameScreen implements Screen, InputProcessor {
         note = new HashMap<String, Texture>();
         key = new HashMap<String, Texture>();
         ready = false;
+        missSound = Gdx.audio.newSound(Gdx.files.internal("mania/combobreak.wav"));
 
         note.put("1", new Texture("mania/mania-note1.png"));
         note.put("2", new Texture("mania/mania-note2.png"));

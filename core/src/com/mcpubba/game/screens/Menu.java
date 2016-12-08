@@ -105,7 +105,7 @@ public class Menu implements Screen, InputProcessor{
                 (x+screenY)/30<items.size()){
             Gdx.app.log("test", screenY+"");
             game.setScreen(new GameScreen(game,
-                    game.getMapByName(items.get((Gdx.graphics.getHeight()+x-screenY)/30))));
+                    game.getMapByName(items.get((x+screenY)/30))));
         }
         return false;
     }

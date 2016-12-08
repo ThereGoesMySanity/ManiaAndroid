@@ -31,7 +31,9 @@ public class Score {
     private float div = 1;
     private ArrayList<Integer> rawAcc;
 
-    public Score(int totalNotes){
+    private Map map;
+    public Score(int totalNotes, Map m){
+        map = m;
         rawAcc = new ArrayList<Integer>();
         score = 0;
         bonus = 100;
