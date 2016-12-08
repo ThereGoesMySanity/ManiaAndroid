@@ -1,4 +1,4 @@
-package com.mcpubba.game;
+package com.mcpubba.game.screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mcpubba.game.game.Map;
+import com.mcpubba.game.ManiaAndroid;
 
 /**
  * Created by Will on 2016-12-06.

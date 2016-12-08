@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.mcpubba.game.game.Map;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -14,17 +16,19 @@ import java.io.IOException;
  * Created by Will on 2016-12-06.
  */
 
-public class AndroidMusicPlayer implements MusicPlayer {
+public class AndroidMusicPlayer implements MusicPlayer, MediaPlayer.OnCompletionListener {
     MediaPlayer music;
     Context c;
+    Map map;
     public AndroidMusicPlayer(Context c){
         this.c=c;
     }
     @Override
-    public void loadMusic(File f){
-
+    public void loadMusic(File f, Map m){
+        map = m;
         music = new MediaPlayer();
         music.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        music.setOnCompletionListener(this);
         try {
             music.setDataSource(c, Uri.fromFile(f));
             music.prepare();
@@ -54,4 +58,8 @@ public class AndroidMusicPlayer implements MusicPlayer {
         return music.getCurrentPosition();
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        map.onFinish();
+    }
 }

@@ -1,16 +1,15 @@
 package com.mcpubba.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mcpubba.game.game.Map;
+import com.mcpubba.game.screens.GameScreen;
+import com.mcpubba.game.screens.Menu;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,8 +19,12 @@ import java.util.HashMap;
 
 public class ManiaAndroid extends Game {
 	SpriteBatch batch;
-    ShapeRenderer shapes;
-    BitmapFont font;
+
+    public BitmapFont getFont() {
+        return font;
+    }
+
+    public BitmapFont font;
     ArrayList<Map> maps;
     HashMap<String, Map> mapNames;
     MusicPlayer music;
@@ -32,7 +35,6 @@ public class ManiaAndroid extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-        shapes = new ShapeRenderer();
         font = new BitmapFont();
         mapNames = new HashMap<String, Map>();
         try {
@@ -51,7 +53,7 @@ public class ManiaAndroid extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
-        shapes.dispose();
+        font.dispose();
 	}
 
     public ArrayList<Map> loadMaps(FileHandle f) throws FileNotFoundException {
@@ -65,7 +67,7 @@ public class ManiaAndroid extends Game {
                         return s.endsWith(".osu");
                     }
                 })){
-                    maps.add(new Map(j.file(), this));
+                    maps.add(new Map(j.file()));
                 }
             }else if(i.name().endsWith(".osz")){
                 DecompressFast d = new DecompressFast(
@@ -80,7 +82,7 @@ public class ManiaAndroid extends Game {
                                         return s.endsWith(".osu");
                                     }
                                 })){
-                    maps.add(new Map(j.file(), this));
+                    maps.add(new Map(j.file()));
                 }
                 i.delete();
             }
@@ -99,13 +101,16 @@ public class ManiaAndroid extends Game {
     public Map getMapByName(String s){
         return mapNames.get(s);
     }
-    public void loadMusic(File f){
-        music.loadMusic(f);
+    public void loadMusic(File f, Map map){
+        music.loadMusic(f, map);
     }
     public void play(){
         music.play();
     }
     public int time(){
         return music.getTime();
+    }
+    public Batch getBatch(){
+        return batch;
     }
 }
