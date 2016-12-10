@@ -21,10 +21,6 @@ public class ScoreScreen implements Screen {
     public ScoreScreen(final ManiaAndroid m, Score s){
         mania = m;
         score = s;
-        Gdx.app.log("Score.Mean: ", s.getMean()+"");
-        Gdx.app.log("Score.UR: ", s.getUR()+"");
-        Gdx.app.log("Score: ", s.getScore()+"");
-        Gdx.app.log("Score.acc: ", s.getAcc()+"");
     }
 
     @Override
@@ -38,12 +34,7 @@ public class ScoreScreen implements Screen {
         int w = Gdx.graphics.getWidth();
         int h = Gdx.graphics.getHeight();
         mania.getBatch().begin();
-        mania.getBatch().setColor(Color.WHITE);
-        mania.font.getData().setScale(10);
-        mania.font.draw(mania.getBatch(), score.getScore()+"", 50, h-100);
-        mania.font.draw(mania.getBatch(), score.getAcc()*100+"%", 50, h-250);
-        mania.font.draw(mania.getBatch(), score.getMaxCombo()+"x", 50, h-400);
-        mania.font.draw(mania.getBatch(), score.getMisses()+" misses", 50, h-550);
+
         mania.getBatch().end();
     }
 

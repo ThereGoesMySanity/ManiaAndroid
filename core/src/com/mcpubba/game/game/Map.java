@@ -170,10 +170,11 @@ public class Map {
             loadedSounds.get(note.getSound(true)).play();
         }
         if(hit==0&&score.getCombo()>19){
-            game.missSound.play();
+            game.game.skin.missSound.play();
         }
+
         score.noteHit(hit, time);
-        game.anim.setCurrentHit(hit);
+        game.game.skin.anim.setCurrentHit(hit);
     }
     private void hold(int lane){
         if(getNote(lane)==null)return;
@@ -208,7 +209,7 @@ public class Map {
             note.slBreak();
             score.sliderBreak();
             if(score.getCombo()>19){
-                game.missSound.play();
+                game.game.skin.missSound.play();
             }
             return;
         }

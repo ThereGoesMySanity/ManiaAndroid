@@ -3,11 +3,17 @@ package com.mcpubba.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.async.AsyncExecutor;
+import com.badlogic.gdx.utils.async.AsyncResult;
+import com.badlogic.gdx.utils.async.AsyncTask;
 import com.mcpubba.game.game.Map;
+import com.mcpubba.game.game.Skin;
 import com.mcpubba.game.screens.Menu;
+import com.mcpubba.game.util.SkinIniParser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,12 +32,15 @@ public class ManiaAndroid extends Game {
     ArrayList<Map> maps;
     HashMap<String, Map> mapNames;
     com.mcpubba.game.util.MusicPlayer music;
+    public Skin skin;
 
     public ManiaAndroid(com.mcpubba.game.util.MusicPlayer music){
         this.music = music;
     }
 	@Override
 	public void create () {
+
+        skin = new Skin(Gdx.files.external("ManiaAndroid/Skins/-+YUGEN+-"));
 		batch = new SpriteBatch();
         font = new BitmapFont();
         mapNames = new HashMap<String, Map>();
@@ -40,7 +49,9 @@ public class ManiaAndroid extends Game {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        skin.load();
         setScreen(new Menu(this));
+
     }
 
 	@Override
@@ -52,6 +63,7 @@ public class ManiaAndroid extends Game {
 	public void dispose () {
 		batch.dispose();
         font.dispose();
+        skin.dispose();
 	}
 
     public ArrayList<Map> loadMaps(FileHandle f) throws FileNotFoundException {

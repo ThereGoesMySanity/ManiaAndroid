@@ -53,6 +53,7 @@ public class Score {
 
     public void noteHit(int acc, int raw){
         if(raw != Integer.MIN_VALUE){
+            Gdx.app.log("hit", raw+" "+getMean());
             rawAcc.add(raw);
         }
         switch(acc){
