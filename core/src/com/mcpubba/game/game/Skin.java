@@ -273,7 +273,7 @@ public class Skin {
                     break;
                 case '%':tex=percent;
                     break;
-                default:tex=combo[as.charAt(i)-48];
+                default:tex=score[as.charAt(i)-48];
                     break;
             }
 
