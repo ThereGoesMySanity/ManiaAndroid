@@ -14,7 +14,7 @@ import java.util.HashMap;
  */
 
 public class GameScreen implements Screen, InputProcessor {
-    public final ManiaAndroid game;
+    public final ManiaAndroid main;
 
     public Map map;
     public float speed = 3;
@@ -24,7 +24,7 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean ready;
 
     public GameScreen(final ManiaAndroid mania, Map m){
-        game = mania;
+        main = mania;
         keysDown = new HashMap<Integer, Integer>();
         ready = false;
 
@@ -46,9 +46,9 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(!ready)return;
         map.update();
-        game.getBatch().begin();
-        game.skin.renderGame(game.getBatch(), this);
-        game.getBatch().end();
+        main.getBatch().begin();
+        main.skin.renderGame(main.getBatch(), this);
+        main.getBatch().end();
         if(Gdx.gl.glGetError()!=0)Gdx.app.log("oglError", ""+Gdx.gl.glGetError());
     }
 
@@ -72,10 +72,6 @@ public class GameScreen implements Screen, InputProcessor {
     public void hide() {
 
     }
-    public void finish(){
-
-    }
-
     @Override
     public void dispose() {
 

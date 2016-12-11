@@ -43,11 +43,11 @@ public class Menu implements Screen, InputProcessor{
         Gdx.gl.glClearColor(0.1f,0.1f,0.1f,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.getBatch().begin();
-        game.font.getData().setScale(2);
+        game.font.getData().setScale(3);
         for(int i = 0; i < items.size(); i++){
             game.font.draw(game.getBatch(),
                     items.get(i),
-                    0, Gdx.graphics.getHeight()+x-i*30
+                    0, Gdx.graphics.getHeight()+x-i*50
             );
         }
         game.getBatch().end();
@@ -101,11 +101,11 @@ public class Menu implements Screen, InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (Gdx.input.getDeltaY(pointer)<2&&
-                (x+screenY)/30>0&&
-                (x+screenY)/30<items.size()){
+                (x+screenY)/50>0&&
+                (x+screenY)/50<items.size()){
             Gdx.app.log("test", screenY+"");
             game.setScreen(new GameScreen(game,
-                    game.getMapByName(items.get((x+screenY)/30))));
+                    game.getMapByName(items.get((x+screenY)/50))));
         }
         return false;
     }

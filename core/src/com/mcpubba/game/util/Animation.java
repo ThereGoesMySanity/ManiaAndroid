@@ -11,6 +11,11 @@ import java.util.ArrayList;
 
 public class Animation {
     int framesElapsed;
+
+    public Texture[] getKeyFrames() {
+        return keyFrames;
+    }
+
     Texture[] keyFrames;
     boolean loop;
     boolean running;

@@ -1,9 +1,7 @@
 package com.mcpubba.game.game;
 
 
-import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.SoundLoader;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.mcpubba.game.screens.GameScreen;
@@ -114,14 +112,14 @@ public class Map {
     }
     public void load(GameScreen g){
         game = g;
-        game.game.loadMusic(mp3.file(), this);
+        game.main.loadMusic(mp3.file(), this);
         if(useHitSounds)loadSounds();
         unHit = new ArrayList<ArrayList<Note>>();
         for(int i = 0; i < notes.size(); i++){
             unHit.add(new ArrayList<Note>());
             unHit.get(i).addAll(notes.get(i));
         }
-        game.game.play();
+        game.main.play();
         game.ready = true;
     }
     public void loadSounds(){
@@ -170,11 +168,11 @@ public class Map {
             loadedSounds.get(note.getSound(true)).play();
         }
         if(hit==0&&score.getCombo()>19){
-            game.game.skin.missSound.play();
+            game.main.skin.missSound.play();
         }
 
         score.noteHit(hit, time);
-        game.game.skin.anim.setCurrentHit(hit);
+        game.main.skin.anim.setCurrentHit(hit);
     }
     private void hold(int lane){
         if(getNote(lane)==null)return;
@@ -209,7 +207,7 @@ public class Map {
             note.slBreak();
             score.sliderBreak();
             if(score.getCombo()>19){
-                game.game.skin.missSound.play();
+                game.main.skin.missSound.play();
             }
             return;
         }
@@ -337,13 +335,13 @@ public class Map {
         }
     }
     public void onFinish(){
-        game.game.setScreen(new ScoreScreen(game.game, score));
+        game.main.setScreen(new ScoreScreen(game.main, score));
     }
     public void pause(){
-        game.game.pause();
+        game.main.pause();
     }
     public void play(){
-        game.game.play();
+        game.main.play();
     }
     public Score getScore(){return score;}
     public int getKeys() {
@@ -375,6 +373,6 @@ public class Map {
     }
 
     public int time(){
-        return game.game.time()-game.offset;
+        return game.main.time()-game.offset;
     }
 }

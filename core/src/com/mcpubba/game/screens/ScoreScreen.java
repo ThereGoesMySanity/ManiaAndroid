@@ -34,7 +34,7 @@ public class ScoreScreen implements Screen {
         int w = Gdx.graphics.getWidth();
         int h = Gdx.graphics.getHeight();
         mania.getBatch().begin();
-
+        mania.skin.renderScore(mania.getBatch(), score);
         mania.getBatch().end();
     }
 

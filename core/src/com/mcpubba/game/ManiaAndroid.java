@@ -39,7 +39,7 @@ public class ManiaAndroid extends Game {
     }
 	@Override
 	public void create () {
-
+        //skin = new Skin();
         skin = new Skin(Gdx.files.external("ManiaAndroid/Skins/-+YUGEN+-"));
 		batch = new SpriteBatch();
         font = new BitmapFont();

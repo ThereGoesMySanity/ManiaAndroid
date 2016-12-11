@@ -12,7 +12,6 @@ import com.mcpubba.game.util.SkinIniParser;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,6 +40,7 @@ public class Skin {
     Texture[] combo;
     Texture[] score;
     public HitAnim anim;
+    ScoreAnim scoreAnim;
     SkinIniParser ini;
     int hitLoc;
     final int textScale = 2;
@@ -68,7 +68,6 @@ public class Skin {
         })[0].name(), file);
         note = loadAnimatableTextures("mania-note",
                 new String[]{"1","2","S","1H","2H","SH","1L","2L","SL","1T","2T","ST"},file, true);
-
         key = loadAnimatableTextures("mania-key",
                 new String[]{"1","2","S","1D","2D","SD"},file, true);
 
@@ -88,6 +87,7 @@ public class Skin {
         for(int i = 0; i < 10; i++){
             score[i] = loadTexture(ini.getFonts("ScorePrefix")+"-"+i, file);
         }
+        scoreAnim = new ScoreAnim(score, this);
         dot = loadTexture(ini.getFonts("ScorePrefix")+"-dot", file);
         percent = loadTexture(ini.getFonts("ScorePrefix")+"-percent", file);
     }
@@ -114,6 +114,7 @@ public class Skin {
             if(f.child(name+i+".png").exists()) {
                 h.put(i, new Texture(f.child(name+i+".png")));
             }else if(!f.equals(Gdx.files.internal("mania"))){
+                Gdx.app.log("default texture", name);
                 return loadTextures(name, poss, Gdx.files.internal("mania"));
             }else{
                 Gdx.app.log("infinite loop o no", name);
@@ -133,6 +134,7 @@ public class Skin {
             }
             return new Animation(arr,framerate, loop);
         }else if(!f.equals(Gdx.files.internal("mania"))){
+            Gdx.app.log("default texture", name);
             return loadAnimatableTexture(name, Gdx.files.internal("mania"), loop, framerate);
         }else{
             Gdx.app.log("infinite loop o no", name);
@@ -167,7 +169,8 @@ public class Skin {
                 }
                 h.put(i, new Animation(arr, framerate, loop));
             }else if(!f.equals(Gdx.files.internal("mania"))){
-                return loadAnimatableTextures(name, poss, Gdx.files.internal("mania"), loop);
+                Gdx.app.log("default texture", name+i);
+                h.put(i, loadAnimatableTexture(name+i, Gdx.files.internal("mania"), loop));
             }else{
                 Gdx.app.log("infinite loop o no", name+i+".png");
             }
@@ -180,7 +183,7 @@ public class Skin {
         int h = Gdx.app.getGraphics().getHeight();
         Map map = game.map;
         int keys = map.getKeys();
-        int t = game.game.time();
+        int t = game.main.time();
         hitLoc = (int)((h-Integer.parseInt(ini.getMania(keys, "HitPosition"))*h/480)* screenScale);
         for(int i = 0; i < keys; i++){
             for(int j = 0; j<map.getUnHit().get(i).size()
@@ -233,23 +236,24 @@ public class Skin {
         int com = map.getScore().getCombo();
         String cs = com+"";
         int gap = -Integer.parseInt(ini.getFonts("ComboOverlap"));
+        int index = 0;
         for(int i = 0; i < cs.length(); i++){
             if (com==0)break;
-            b.draw(combo[cs.charAt(i)-48],
-                    (w+(2*i-cs.length())*(gap+combo[0].getWidth()*textScale)+gap)/2,
-                    (h-h*Integer.parseInt(ini.getMania(keys, "ComboPosition"))/480)* screenScale,
-                    combo[0].getWidth()*textScale, combo[0].getHeight()*textScale);
+            index+=combo[cs.charAt(i)-48].getWidth()*textScale+gap;
         }
-        String ss = map.getScore().getScore()+"";
-        gap = -Integer.parseInt(ini.getFonts("ScoreOverlap"));
-        for(int i = 0; i < ss.length(); i++){
-            b.draw(score[ss.charAt(i)-48], w-(gap+score[0].getWidth()*textScale)*(ss.length()-i),
-                    h- score[0].getHeight()*textScale,
-                    score[0].getWidth()*textScale, score[0].getHeight()*textScale);
+        int i2 = index;
+        for(int i = 0; i < cs.length(); i++){
+            if (com==0)break;
+            // alt y: (h-Integer.parseInt(ini.getMania(keys, "ComboPosition"))*h/480
+            b.draw(combo[cs.charAt(i)-48], (w+i2)/2-index,
+                    h*3/4,
+                    combo[cs.charAt(i)-48].getWidth()*textScale,
+                    combo[cs.charAt(i)-48].getHeight()*textScale);
+            index-=combo[cs.charAt(i)-48].getWidth()*textScale+gap;
         }
         String as = String.format("%.2f%%", map.getScore().getAcc()*100);
         if(as.length()<5)as="0"+as;
-        int index = 0;
+        index = 0;
         for(int i = 0; i < as.length(); i++){
             Texture tex;
             switch (as.charAt(i)){
@@ -272,12 +276,15 @@ public class Skin {
                 default:tex=combo[as.charAt(i)-48];
                     break;
             }
-            index-=tex.getWidth()*textScale+gap;
-            b.draw(tex, w-tex.getWidth()*textScale-index, h-tex.getHeight()*textScale*2,
+
+            b.draw(tex, w-index, h-combo[0].getHeight()*textScale*2,
                     tex.getWidth()*textScale, tex.getHeight()*textScale);
+            index-=tex.getWidth()*textScale+gap;
 
         }
-        anim.draw(b, w/2, (h-h*Integer.parseInt(ini.getMania(keys, "ScorePosition"))/480)* screenScale, 2);
+        scoreAnim.draw(b, w, h, true, game);
+        //(h-h*Integer.parseInt(ini.getMania(keys, "ScorePosition"))/480)
+        anim.draw(b, w/2, h*2/3, 2);
     }
     public static FileHandle fileIgnoreCase(FileHandle parent, final String str){
         return parent.list(new FilenameFilter() {
